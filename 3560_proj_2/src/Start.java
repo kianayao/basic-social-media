@@ -473,7 +473,7 @@ public class Start {
 			public void actionPerformed(ActionEvent e) {
 				JInternalFrame intFLstU = new JInternalFrame("Last Updated User");
 				intFLstU.setClosable(true);
-				intFLstU.setBounds(330, 170, 200, 60);
+				intFLstU.setBounds(240, 165, 400, 71);
 				adminFrame.getContentPane().add(intFLstU);
 				intFLstU.getContentPane().setLayout(null);
 				
@@ -481,7 +481,7 @@ public class Start {
 				txtluumsgs.setFont(new Font("Tahoma", Font.PLAIN, 15));
 				txtluumsgs.setEditable(false);
 				txtluumsgs.setText(lastUpdatedMsg(getLastUpdatedUsr()));
-				txtluumsgs.setBounds(0, 0, 316, 47);
+				txtluumsgs.setBounds(0, 0, 400, 47);
 				intFLstU.getContentPane().add(txtluumsgs);
 				intFLstU.setVisible(true);
 			}
@@ -497,19 +497,21 @@ public class Start {
 	
 	private Node getLastUpdatedUsr() {
 		long greatest = -1, compare;
-		int counter = 0;
+		int counter = 0, count_node = -1;
 		for (Node n: nodes) {
 			if (n instanceof User) {
 				compare = ((User)n).getLastUpdated();
-				if (compare > greatest)
+				if (compare > greatest) {
 					greatest = compare;
+					count_node = counter;
+				}
 			}
 			++counter;
 		}
 		
 		if (greatest == -1) 
 			return new User("NOUSERS");
-		return nodes.get(counter);
+		return nodes.get(count_node);
 	}
 	
 	public static Node getNode(String userName) {
