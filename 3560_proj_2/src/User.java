@@ -110,6 +110,7 @@ public class User extends Node{
 						_following.add(_txtUsrFollow.getText());
 						_followingModel.addElement(_txtUsrFollow.getText());
 						((User)user).addFollower(tempThis);
+						_lastUpdated = System.currentTimeMillis();						
 					}
 				}
 				else
