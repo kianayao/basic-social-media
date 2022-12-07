@@ -4,6 +4,7 @@ public class Group extends Node{
     public Group(String id){
         children = new HashMap<String, Node>();
         super._id = id;
+        super._creationTime = System.currentTimeMillis();
 
     }
 
