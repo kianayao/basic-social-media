@@ -81,6 +81,8 @@ public class Start {
 		addMsgTotalBtn();
 		addGroupTotalBtn();
 		addPosPercBtn();
+		validateUnAndGrps();
+		lastUpdatedUsr();
 	}
 	
 	private void addAdminPanel() {
@@ -112,12 +114,6 @@ public class Start {
 				return true;
 		}
 		return false;
-	}
-
-	private void updateTreeUI(){
-		model.reload(top);  // called from event dispatcher thread
-		System.out.print("printing top: ");
-		System.out.println(top);
 	}
 
 	private void addTreeUI() {
@@ -203,7 +199,7 @@ public class Start {
 						treeNodes.add(temp);
 						((Group)currentNode).addChild(newUser);
 						nodes.add(newUser);
-						updateTreeUI();
+						model.reload(top);
 						++usr_t;
 					}
 					else
@@ -211,8 +207,6 @@ public class Start {
 				}
 				else
 					addNotGrpErrMsg();
-				System.out.println(nodes.get(0));
-
 			}
 		});
 		adminFrame.getContentPane().add(btnAddUser);
@@ -255,7 +249,7 @@ public class Start {
 						
 						((Group)currentNode).addChild(newGroup);
 						nodes.add(newGroup);
-						updateTreeUI();
+						model.reload(top);
 						++grp_t;
 					}
 					else
@@ -263,7 +257,6 @@ public class Start {
 				}
 				else
 					addNotGrpErrMsg();
-				System.out.println(nodes.get(0));
 			}
 		});
 		adminFrame.getContentPane().add(btnAddGroup);
@@ -305,8 +298,8 @@ public class Start {
 	}
 	
 	private void addUserTotalBtn() {
-		JButton btnShowUserTotal = new JButton("Show User Total");
-		btnShowUserTotal.setBounds(224, 240, 213, 44);
+		JButton btnShowUserTotal = new JButton("User Total");
+		btnShowUserTotal.setBounds(224, 240, 131, 44);
 		btnShowUserTotal.setForeground(new Color(255, 255, 255));
 		btnShowUserTotal.setBackground(new Color(10, 56, 103));
 		btnShowUserTotal.addActionListener(new ActionListener() {
@@ -326,16 +319,16 @@ public class Start {
 				intFUserTotal.setVisible(true);
 			}
 		});
-		btnShowUserTotal.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnShowUserTotal.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		adminFrame.getContentPane().add(btnShowUserTotal);
 	}
 	
 	private void addMsgTotalBtn() {
-		JButton btnShowMessagesTotal = new JButton("Show Messages Total");
-		btnShowMessagesTotal.setBounds(224, 294, 213, 44);
+		JButton btnShowMessagesTotal = new JButton("Message Total");
+		btnShowMessagesTotal.setBounds(224, 294, 131, 44);
 		btnShowMessagesTotal.setForeground(new Color(255, 255, 255));
 		btnShowMessagesTotal.setBackground(new Color(10, 56, 103));
-		btnShowMessagesTotal.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnShowMessagesTotal.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnShowMessagesTotal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JInternalFrame intFMsgsTotal = new JInternalFrame("Messages Total");
@@ -357,11 +350,11 @@ public class Start {
 	}
 	
 	private void addGroupTotalBtn() {
-		JButton btnShowGroupTotal = new JButton("Show Group Total");
-		btnShowGroupTotal.setBounds(443, 240, 213, 44);
+		JButton btnShowGroupTotal = new JButton("Group Total");
+		btnShowGroupTotal.setBounds(376, 240, 131, 44);
 		btnShowGroupTotal.setForeground(new Color(255, 255, 255));
 		btnShowGroupTotal.setBackground(new Color(10, 56, 103));
-		btnShowGroupTotal.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnShowGroupTotal.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnShowGroupTotal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JInternalFrame intFGroupTotal = new JInternalFrame("Group Total");
@@ -383,11 +376,11 @@ public class Start {
 	}
 	
 	private void addPosPercBtn() {
-		JButton btnShowPosPercent = new JButton("Show Positive \r\nPercentage");
-		btnShowPosPercent.setBounds(443, 294, 213, 44);
+		JButton btnShowPosPercent = new JButton("Positive Percentage");
+		btnShowPosPercent.setBounds(376, 294, 131, 44);
 		btnShowPosPercent.setForeground(new Color(255, 255, 255));
 		btnShowPosPercent.setBackground(new Color(10, 56, 103));
-		btnShowPosPercent.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnShowPosPercent.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		btnShowPosPercent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JInternalFrame intFPosPerc = new JInternalFrame("Group Total");
@@ -408,6 +401,117 @@ public class Start {
 		adminFrame.getContentPane().add(btnShowPosPercent);
 	}
 	
+	private void validateUnAndGrps() {
+		JButton btnVerify = new JButton("Validate");
+		btnVerify.setForeground(Color.WHITE);
+		btnVerify.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnVerify.setBackground(new Color(10, 56, 103));
+		btnVerify.setBounds(527, 240, 131, 44);
+		btnVerify.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean whitespace = false, nonUnique = false;
+				int counter = 0;
+				for (Node n: nodes) {
+					if (! whitespace && hasWhitespaces(n._id))
+						whitespace = true;
+					if (! nonUnique && hasDuplicate(n._id, counter))
+						nonUnique = true;
+					counter++;
+				}
+				
+				JInternalFrame intFvalid = new JInternalFrame("Valid Usernames/Groups?");
+				intFvalid.setClosable(true);
+				intFvalid.setBounds(310, 170, 280, 60);
+				adminFrame.getContentPane().add(intFvalid);
+				intFvalid.getContentPane().setLayout(null);
+				
+				JTextPane txtlvugmsgs = new JTextPane();
+				txtlvugmsgs.setFont(new Font("Tahoma", Font.PLAIN, 13));
+				txtlvugmsgs.setEditable(false);
+				txtlvugmsgs.setText(validErrMsg(whitespace, nonUnique));
+				txtlvugmsgs.setBounds(0, 0, 340, 47);
+				intFvalid.getContentPane().add(txtlvugmsgs);
+				intFvalid.setVisible(true);
+			}
+		});
+		adminFrame.getContentPane().add(btnVerify);
+	}
+	
+	private String validErrMsg(boolean whitespaces, boolean nonUnique) {
+		if (whitespaces && nonUnique)
+			return "Invalid Usernames/Group Names: Spaces and Duplicates";
+		else if (whitespaces)
+			return "Invalid Usernames/Group Names: Spaces";
+		else if (nonUnique)
+			return "Invalid Usernames/Group Names: Duplicates";
+		return "All Usernames/Group Names are Valid :)";
+	}
+	
+	private boolean hasWhitespaces(String check) {
+		for (int i = 0; i < check.length(); ++i) {
+			if (Character.isWhitespace(check.charAt(i)))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean hasDuplicate(String check, int n) {
+		for (int i = 0; i < nodes.size(); ++i) {
+			if (check.equals(nodes.get(i)._id) && i != n)
+				return true;
+		}
+		return false;
+	}
+	
+	private void lastUpdatedUsr() {
+		JButton btnLastUpdatedUsr = new JButton("Last Updated");
+		btnLastUpdatedUsr.setForeground(Color.WHITE);
+		btnLastUpdatedUsr.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnLastUpdatedUsr.setBackground(new Color(10, 56, 103));
+		btnLastUpdatedUsr.setBounds(527, 294, 131, 44);
+		btnLastUpdatedUsr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JInternalFrame intFLstU = new JInternalFrame("Last Updated User");
+				intFLstU.setClosable(true);
+				intFLstU.setBounds(330, 170, 200, 60);
+				adminFrame.getContentPane().add(intFLstU);
+				intFLstU.getContentPane().setLayout(null);
+				
+				JTextPane txtluumsgs = new JTextPane();
+				txtluumsgs.setFont(new Font("Tahoma", Font.PLAIN, 15));
+				txtluumsgs.setEditable(false);
+				txtluumsgs.setText(lastUpdatedMsg(getLastUpdatedUsr()));
+				txtluumsgs.setBounds(0, 0, 316, 47);
+				intFLstU.getContentPane().add(txtluumsgs);
+				intFLstU.setVisible(true);
+			}
+		});
+		adminFrame.getContentPane().add(btnLastUpdatedUsr);
+	}
+	
+	private String lastUpdatedMsg(Node n) {
+		if (n._id.equals("NOUSERS"))
+			return "There are no users.";
+		return n._id + " was the last updated user. Last updated: " + String.valueOf(((User)n).getLastUpdated());
+	}
+	
+	private Node getLastUpdatedUsr() {
+		long greatest = -1, compare;
+		int counter = 0;
+		for (Node n: nodes) {
+			if (n instanceof User) {
+				compare = ((User)n).getLastUpdated();
+				if (compare > greatest)
+					greatest = compare;
+			}
+			++counter;
+		}
+		
+		if (greatest == -1) 
+			return new User("NOUSERS");
+		return nodes.get(counter);
+	}
+	
 	public static Node getNode(String userName) {
 		Node n;
 		Node temp = new Node();
@@ -415,8 +519,11 @@ public class Start {
 			n = set.getValue();
 			if(n._id.equals(userName))
 				return n;
-			else if (n instanceof Group)
-				return getNode(userName,(Group)n);
+			else if (n instanceof Group) {
+				temp = getNode(userName,(Group)n);
+				if (temp._id.equals(userName))
+					return temp;
+			}
 		}
 		return new Group("nodeNotFound");
 	}
@@ -426,12 +533,13 @@ public class Start {
 		Node temp = new Node();
 		for(Map.Entry<String, Node> set : g.children.entrySet()){
 			n = set.getValue();
-			System.out.print("getnode: ");
-			System.out.println(n._id);
 			if(n._id.equals(userName))
 				return n;
-			else if (n instanceof Group)
-				return getNode(userName,(Group)n);
+			else if (n instanceof Group) {
+				temp = getNode(userName,(Group)n);
+				if (temp._id.equals(userName))
+					return temp;
+			}
 		}
 		return new Group("nodeNotFound");
 	}
