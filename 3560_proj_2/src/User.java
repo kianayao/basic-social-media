@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 public class User extends Node{
+	private long _lastUpdated;
 	private JFrame _userFrame;
 	private JTextField _txtUsrFollow;
 	private JTextField _txtUserId;
@@ -31,6 +32,8 @@ public class User extends Node{
 
 	public User(String id){
 		super._id = id;
+		super._creationTime = System.currentTimeMillis();
+		_lastUpdated = System.currentTimeMillis();
 	}
 	
 	
@@ -44,7 +47,7 @@ public class User extends Node{
 	}
 	
 	private void displayBase() {
-		_userFrame = new JFrame(super._id);
+		_userFrame = new JFrame(super._id + " Time Created: " + String.valueOf(super._creationTime));
 		_userFrame.getContentPane().setBackground(new Color(255, 225, 240));
 		_userFrame.setBounds(100, 100, 382, 470);
 		_userFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -102,8 +105,6 @@ public class User extends Node{
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Node user = Start.getNode(_txtUsrFollow.getText());
-				System.out.println("follow id: ");
-				System.out.println(user._id);
 				if (user instanceof User && !(_txtUsrFollow.getText().equals(tempThis._id))) {
 					if (_following.isEmpty() || !_following.contains(_txtUsrFollow.getText())) {
 						_following.add(_txtUsrFollow.getText());
@@ -166,6 +167,7 @@ public class User extends Node{
 			public void actionPerformed(ActionEvent e) {
 				Post userPost = new Post(_id, _txtMsgEntry.getText());
 				_feedModel.addElement(userPost.toString());
+				_lastUpdated = System.currentTimeMillis();
 				updateFollowerFeed(userPost);
 			}
 		});
@@ -195,8 +197,19 @@ public class User extends Node{
 		_feedModel.addElement(p.toString());
 	}
 	
+	private void updateLastUpdated() {
+		_lastUpdated = System.currentTimeMillis();
+	}
+	
+	public long getLastUpdated() {
+		return _lastUpdated;
+	}
+	
+	
 	private void updateFollowerFeed(Post p) {
-		for (User u: _followers)
+		for (User u: _followers) {
 			u.addToFeed(p);
+			u.updateLastUpdated();
+		}
 	}
 }
